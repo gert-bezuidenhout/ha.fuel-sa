@@ -1,0 +1,14 @@
+{
+  "domain": "fuelsa",
+  "name": "Fuel SA",
+  "codeowners": [
+    "@gert-bezuidenhout"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/gert-bezuidenhout/ha.fuel-sa",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/gert-bezuidenhout/ha.fuel-sa/issues",
+  "requirements": [],
+  "version": "1.0.1"
+}

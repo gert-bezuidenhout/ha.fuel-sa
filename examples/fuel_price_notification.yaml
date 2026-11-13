@@ -1,0 +1,57 @@
+# Paste into a new automation's YAML editor (one automation, not a list).
+alias: Fuel SA | Notify on price change
+description: Notify when any current Fuel SA price changes between two numeric states.
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.fuel_sa_coast_diesel_500_ppm
+      - sensor.fuel_sa_coast_diesel_50_ppm
+      - sensor.fuel_sa_coast_petrol_lrp_95
+      - sensor.fuel_sa_coast_petrol_unleaded_93
+      - sensor.fuel_sa_coast_petrol_unleaded_95
+      - sensor.fuel_sa_reef_diesel_500_ppm
+      - sensor.fuel_sa_reef_diesel_50_ppm
+      - sensor.fuel_sa_reef_petrol_lrp_95
+      - sensor.fuel_sa_reef_petrol_unleaded_93
+      - sensor.fuel_sa_reef_petrol_unleaded_95
+    to: null
+conditions:
+  - condition: template
+    value_template: >-
+      {{ trigger.from_state is not none
+         and trigger.to_state is not none
+         and is_number(trigger.from_state.state)
+         and is_number(trigger.to_state.state)
+         and (trigger.from_state.state | float) != (trigger.to_state.state | float) }}
+actions:
+  - action: script.notification_all
+    data:
+      message: >-
+        {% set old = trigger.from_state.state | float %}
+        {% set new = trigger.to_state.state | float %}
+        {% set change = ((new - old) * 100) | round(2) %}
+        {% set label = trigger.to_state.attributes.friendly_name | default(trigger.entity_id) %}
+        {{ label }} has {{ 'increased' if change > 0 else 'decreased' }}
+        from R{{ '%.2f' | format(old) }} to R{{ '%.2f' | format(new) }} per litre
+        ({{ '%.2f' | format(change | abs) }} cents per litre
+        {{ 'more' if change > 0 else 'less' }}).
+        {% set effective = trigger.to_state.attributes.get('effective_at') %}
+        {% if effective %}
+        Effective {{ as_timestamp(effective) | timestamp_custom('%d %B %Y', true) }}.
+        {% endif %}
+        {% if trigger.to_state.attributes.get('fuel') == 'diesel' %}
+        Diesel prices are wholesale; filling-station prices may differ.
+        {% endif %}
+      emoji: "⛽"
+      tts_enabled: false
+      tts_importance: low
+      tts_language: en-GB
+      tts_voice: RyanNeural
+      volume_level: 0.5
+      whatsapp_gert: true
+      whatsapp_gert_priority: true
+      whatsapp_letitia: false
+      whatsapp_letitia_priority: false
+      whatsapp_file: ""
+mode: queued
+max: 20

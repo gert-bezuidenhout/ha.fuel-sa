@@ -1,0 +1,55 @@
+# Dashboard > Edit > Add card > Manual. No custom cards required.
+type: markdown
+entity_id:
+  - sensor.fuel_sa_coast_diesel_500_ppm
+  - sensor.fuel_sa_coast_diesel_50_ppm
+  - sensor.fuel_sa_coast_petrol_lrp_95
+  - sensor.fuel_sa_coast_petrol_unleaded_93
+  - sensor.fuel_sa_coast_petrol_unleaded_95
+  - sensor.fuel_sa_reef_diesel_500_ppm
+  - sensor.fuel_sa_reef_diesel_50_ppm
+  - sensor.fuel_sa_reef_petrol_lrp_95
+  - sensor.fuel_sa_reef_petrol_unleaded_93
+  - sensor.fuel_sa_reef_petrol_unleaded_95
+content: |-
+  <img src="/local/fuelsa/logo-header.svg?v=2" alt="Fuel SA" width="100%">
+
+  ### South African fuel prices
+  {% macro price(entity) -%}
+  {% set value = states(entity) %}
+  {{ ('R%.2f' | format(value | float)) if is_number(value) else 'Unavailable' }}
+  {%- endmacro %}
+  {% set rows = [
+    ('Unleaded 93', 'petrol_unleaded_93'),
+    ('Unleaded 95', 'petrol_unleaded_95'),
+    ('LRP 95', 'petrol_lrp_95'),
+    ('Diesel 50 ppm', 'diesel_50_ppm'),
+    ('Diesel 500 ppm', 'diesel_500_ppm')
+  ] %}
+
+  <table width="100%">
+  <thead><tr><th width="44%">Fuel · ZAR/litre</th><th width="28%">Reef / Inland</th><th width="28%">Coast</th></tr></thead>
+  <tbody>
+  {% for label, suffix in rows -%}
+  <tr><td>{{ label }}</td><td align="right">{{ price('sensor.fuel_sa_reef_' ~ suffix) | trim }}</td><td align="right">{{ price('sensor.fuel_sa_coast_' ~ suffix) | trim }}</td></tr>
+  {% endfor %}
+  </tbody>
+  </table>
+
+  {%- set ns = namespace(dates=[], details=[]) %}
+  {%- for region in ['reef', 'coast'] %}
+    {%- for label, suffix in rows %}
+      {%- set date = state_attr('sensor.fuel_sa_' ~ region ~ '_' ~ suffix, 'effective_at') %}
+      {%- set text = (as_timestamp(date) | timestamp_custom('%d %b %Y', true)) if date else 'Unavailable' %}
+      {%- set ns.dates = ns.dates + [text] %}
+      {%- set ns.details = ns.details + [region | title ~ ' ' ~ label ~ ': ' ~ text] %}
+    {%- endfor %}
+  {%- endfor %}
+
+  {% if ns.dates | unique | list | count == 1 %}
+  **Effective:** {{ ns.dates[0] }}
+  {% else %}
+  **Price effective dates**<br>{{ ns.details | join('<br>') }}
+  {% endif %}
+
+  <small>Petrol: retail · Diesel: wholesale, pump prices may differ.<br>Refreshes every six hours · Data: Fuel SA</small>
