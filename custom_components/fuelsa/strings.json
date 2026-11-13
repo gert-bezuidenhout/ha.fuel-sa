@@ -1,0 +1,29 @@
+{
+  "title": "Fuel SA",
+  "config": {
+    "error": {
+      "cannot_connect": "Unable to retrieve prices. Check your connection and Fuel SA service availability.",
+      "invalid_auth": "The API key is invalid or no longer authorized."
+    },
+    "step": {
+      "reauth_confirm": {
+        "title": "Reconnect to Fuel SA",
+        "data": {
+          "api_key": "API key"
+        },
+        "description": "Your API key was rejected. Enter a valid Fuel SA API key."
+      },
+      "user": {
+        "title": "Connect to Fuel SA",
+        "data": {
+          "api_key": "API key"
+        },
+        "description": "Enter the API key supplied by Fuel SA. Prices for Reef and Coast refresh every six hours."
+      }
+    },
+    "abort": {
+      "reauth_successful": "Fuel SA authentication updated successfully.",
+      "already_configured": "Fuel SA is already configured."
+    }
+  }
+}
