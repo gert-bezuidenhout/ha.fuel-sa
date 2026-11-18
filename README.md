@@ -24,7 +24,7 @@ This package requires Home Assistant 2026.3 or newer, including local branding s
 
 ## Install with HACS
 
-Default catalogue submission remains deferred. Install as a custom repository:
+This integration is not yet included in the default Marketplace catalogue. Until catalogue acceptance, install as a custom repository:
 
 1. Install and configure [HACS](https://www.hacs.xyz/docs/use/).
 2. Open HACS > menu > **Custom repositories**.
